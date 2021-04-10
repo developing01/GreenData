@@ -158,8 +158,8 @@ class Ui_MainWindow():
         _translate = QtCore.QCoreApplication.translate
         MainWindow.setWindowTitle(_translate("MainWindow", "GreenData"))
         self.label.setText(_translate("MainWindow", "Статистика посівів"))
-        self.textEdit.setPlaceholderText(_translate("MainWindow", "Введіть діапазон дат..."))
-        self.label_2.setText(_translate("MainWindow", "Отримати статистику за період:"))
+        self.textEdit.setPlaceholderText(_translate("MainWindow", "Введіть рік..."))
+        self.label_2.setText(_translate("MainWindow", "Отримати статистику за рік:"))
         self.label_3.setText(_translate("MainWindow", "Додати посів:"))
         self.textEdit_2.setPlaceholderText(_translate("MainWindow", "Введіть данні посіву..."))
         self.pushButton.setText(_translate("MainWindow", "Додати"))
