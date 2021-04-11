@@ -1,5 +1,5 @@
 from Graph_interface import Ui_MainWindow
-from PyQt5 import QtCore, QtGui, QtWidgets
+from PyQt5 import QtWidgets
 import sqlite3
 import time
 from datetime import datetime
@@ -18,6 +18,9 @@ class Green_app(Ui_MainWindow, QtWidgets.QMainWindow):
         self.pushButton_4.pressed.connect(self.add_income)
         self.pushButton_5.pressed.connect(self.get_income)
 
+        #При запуску додатку виводить список останніх доданих фінансових данних
+        self.show_activity()
+
     def add_sowing(self):
         #метод для додавання в базу необхідної інформації про посів
         current_year = datetime.now()
@@ -35,42 +38,95 @@ class Green_app(Ui_MainWindow, QtWidgets.QMainWindow):
             sqlite_connection.close()
             self.textBrowser.append(add_time + '  ' + data)
         except:
-            self.textBrowser.append('Помилка бази')
+            self.textBrowser.append('Треба ввести необхідні данні, або виникла помилка бази данних...')
 
         self.textEdit_2.clear()
 
     def get_sowing(self):
         #Метод для отримання інформації за певний період
         #Підключаємося до бази, отримуємо данні і виводимо необхідні, обов'язково обробляємо помилки при роботі з БД
+        self.textBrowser.clear()
         try:
             sqlite_connection = sqlite3.connect('Sowing_data.db')
             cursor = sqlite_connection.cursor()
             get_year = self.textEdit.toPlainText()
-            cursor.execute('SELECT * FROM Sowings')
+            cursor.execute('SELECT * FROM Sowings;')
             data = cursor.fetchall()
             for row in data:
                 if row[2] == int(get_year):
                     self.textBrowser.append(row[0] + '  ' + row[1])
             sqlite_connection.close()
         except:
-            self.textBrowser.append('Помилка бази')
+            self.textBrowser.append('Треба ввести необхідні данні, або виникла помилка бази данних...')
+    #метод для виведення данних при запуску
+    def show_activity(self):
+        try:
+            sql_connection = sqlite3.connect('Finance_data.db')
+            cursor = sql_connection.cursor()
+            cursor.execute('SELECT * FROM Finances;')
+            data = cursor.fetchall()
+            for row in data:
+                self.textBrowser_2.append('рік ' + str(row[2]) + '    ' + row[0] + '  ' + str(row[1]))
+            sql_connection.close()
+        except:
+            self.textBrowser_2.append('POW')
 
+    #метод для додавання витрати, для фінансових данних створили іншу базу
     def add_expenditure(self):
-        sqlite_connection = sqlite3.connect('Finance_data.db')
-        cursor = sqlite_connection.cursor()
+        object_exp = self.textEdit_3.toPlainText()
+        current_year = datetime.now()
+        year = current_year.year
+        data = int(self.textEdit_4.toPlainText())
 
+        expenditure = (object_exp, -data, year)
+
+        try:
+            sqlite_connection = sqlite3.connect('Finance_data.db')
+            cursor = sqlite_connection.cursor()
+            cursor.execute('INSERT INTO Finances VALUES(?, ?, ?);', expenditure)
+            sqlite_connection.commit()
+            self.textBrowser_2.append(time.ctime() + '  ' + object_exp + '  -' + str(data))
+
+            sqlite_connection.close()
+        except:
+            self.textBrowser_2.append('Треба ввести необхідні данні, або виникла помилка бази данних...')
+
+    #метод для додавання доходів
     def add_income(self):
-        sqlite_connection = sqlite3.connect('Finance_data.db')
-        cursor = sqlite_connection.cursor()
+        data = self.textEdit_5.toPlainText()
+        current_year = datetime.now()
+        year = current_year.year
+        income = ('', data, year)
+        try:
+            sqlite_connection = sqlite3.connect('Finance_data.db')
+            cursor = sqlite_connection.cursor()
+            cursor.execute('INSERT INTO Finances VALUES(?, ?, ?);', income)
+            sqlite_connection.commit()
+            self.textBrowser_2.append(time.ctime() + '  +' + str(data))
 
+            sqlite_connection.close()
+        except:
+            self.textBrowser_2.append('Треба ввести необхідні данні, або виникла помилка бази данних...')
+    #метод для отримання доходу за певний рік
     def get_income(self):
-        sqlite_connection = sqlite3.connect('Finance_data.db')
-        cursor = sqlite_connection.cursor()
+        self.textBrowser_3.clear()
+        year = self.textEdit_6.toPlainText()
+        try:
+            sqlite_connection = sqlite3.connect('Finance_data.db')
+            cursor = sqlite_connection.cursor()
+            cursor.execute('SELECT * FROM Finances;')
+            data = cursor.fetchall()
+            all_income = 0
+            for row in data:
+                if row[2] == int(year):
+                    all_income += row[1]
+            self.textBrowser_3.append(str(all_income))
+            sqlite_connection.close()
+        except:
+            self.textBrowser_3.append('Треба ввести необхідні данні, або виникла помилка бази данних...')
 
-
+#для запуску додатку створюємо об'єкт класу Green_app і запускаємо за допомогою методу show
 app = QtWidgets.QApplication([])
 window = Green_app()
 window.show()
 app.exec()
-
-
