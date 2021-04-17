@@ -27,26 +27,30 @@ class Green_app(Ui_MainWindow, QtWidgets.QMainWindow):
 
     #метод для створення баз данних
     def create_DB(self):
-        sqlite_connection_sowing = sqlite3.connect('Sowing_data.db')
-        sqlite_connection_finance = sqlite3.connect('Finance_data.db')
-        sowing_cursor = sqlite_connection_sowing.cursor()
-        finance_cursor = sqlite_connection_finance.cursor()
 
-        sowing_cursor.execute('''CREATE TABLE IF NOT EXISTS Sowings(
-                              time TEXT,
-                              data TEXT,
-                              year INT);
-                              ''')
-        sqlite_connection_sowing.commit()
+        try:
+            sqlite_connection_sowing = sqlite3.connect('Sowing_data.db')
+            sqlite_connection_finance = sqlite3.connect('Finance_data.db')
+            sowing_cursor = sqlite_connection_sowing.cursor()
+            finance_cursor = sqlite_connection_finance.cursor()
 
-        finance_cursor.execute('''CREATE TABLE IF NOT EXISTS Finances(
-                                object TEXT,
-                                data INT,
-                                year INT);
-                                ''')
-        sqlite_connection_finance.commit()
-        sqlite_connection_sowing.close()
-        sqlite_connection_finance.close()
+            sowing_cursor.execute('''CREATE TABLE IF NOT EXISTS Sowings(
+                                  time TEXT,
+                                  data TEXT,
+                                  year INT);
+                                  ''')
+            sqlite_connection_sowing.commit()
+
+            finance_cursor.execute('''CREATE TABLE IF NOT EXISTS Finances(
+                                    object TEXT,
+                                    data INT,
+                                    year INT);
+                                    ''')
+            sqlite_connection_finance.commit()
+            sqlite_connection_sowing.close()
+            sqlite_connection_finance.close()
+        except:
+            self.textBrowser.append('Помилка створення бази данних')
 
     def add_sowing(self):
         #метод для додавання в базу необхідної інформації про посів
@@ -85,6 +89,7 @@ class Green_app(Ui_MainWindow, QtWidgets.QMainWindow):
             sqlite_connection.close()
         except:
             self.textBrowser.append('Треба ввести необхідні данні, або виникла помилка бази данних...')
+
     #метод для виведення данних при запуску
     def show_activity(self):
         try:
