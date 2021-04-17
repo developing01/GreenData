@@ -1,0 +1,7 @@
+[Desktop Entry]
+Version=1.0
+Name=GreenData
+Comment=Start
+Exec=/home/user/PycharmProjects/GreenData/dist/GreenData
+Terminal=false
+Type=Application
