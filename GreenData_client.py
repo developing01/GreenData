@@ -11,6 +11,9 @@ class Green_app(Ui_MainWindow, QtWidgets.QMainWindow):
         super().__init__()
         self.setupUi(self)
 
+        #Запускаємо метод для створення баз данних якщо вони ще не існують
+        self.create_DB()
+
         #Назначеаємо кнопки під необхідні методи класу
         self.pushButton.pressed.connect(self.add_sowing)
         self.pushButton_2.pressed.connect(self.get_sowing)
@@ -20,6 +23,30 @@ class Green_app(Ui_MainWindow, QtWidgets.QMainWindow):
 
         #При запуску додатку виводить список останніх доданих фінансових данних
         self.show_activity()
+
+
+    #метод для створення баз данних
+    def create_DB(self):
+        sqlite_connection_sowing = sqlite3.connect('Sowing_data.db')
+        sqlite_connection_finance = sqlite3.connect('Finance_data.db')
+        sowing_cursor = sqlite_connection_sowing.cursor()
+        finance_cursor = sqlite_connection_finance.cursor()
+
+        sowing_cursor.execute('''CREATE TABLE IF NOT EXISTS Sowings(
+                              time TEXT,
+                              data TEXT,
+                              year INT);
+                              ''')
+        sqlite_connection_sowing.commit()
+
+        finance_cursor.execute('''CREATE TABLE IF NOT EXISTS Finances(
+                                object TEXT,
+                                data INT,
+                                year INT);
+                                ''')
+        sqlite_connection_finance.commit()
+        sqlite_connection_sowing.close()
+        sqlite_connection_finance.close()
 
     def add_sowing(self):
         #метод для додавання в базу необхідної інформації про посів
@@ -107,6 +134,7 @@ class Green_app(Ui_MainWindow, QtWidgets.QMainWindow):
             sqlite_connection.close()
         except:
             self.textBrowser_2.append('Треба ввести необхідні данні, або виникла помилка бази данних...')
+
     #метод для отримання доходу за певний рік
     def get_income(self):
         self.textBrowser_3.clear()
@@ -124,6 +152,7 @@ class Green_app(Ui_MainWindow, QtWidgets.QMainWindow):
             sqlite_connection.close()
         except:
             self.textBrowser_3.append('Треба ввести необхідні данні, або виникла помилка бази данних...')
+
 
 #для запуску додатку створюємо об'єкт класу Green_app і запускаємо за допомогою методу show
 app = QtWidgets.QApplication([])
